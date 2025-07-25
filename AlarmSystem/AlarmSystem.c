@@ -25,7 +25,7 @@ void detectMotion(){
         gpio_put(ALARM_PIN,1);
         gpio_put(LED_PIN,1);
         gpio_put(SIGNAL_PIN,1);
-        sleep_ms(50);
+        sleep_ms(100);
         lastTriger=now;
         gpio_put(ALARM_PIN,0);
         gpio_put(LED_PIN,0);
