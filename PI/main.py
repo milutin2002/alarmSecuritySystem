@@ -5,7 +5,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(26,GPIO.IN)
 
 def motion_detected(channel):
-	print("Motion detected by Pico")
+	print("Motion detected by Pico and send to pi")
 	time.sleep(5)
 
 GPIO.add_event_detect(26,GPIO.RISING,callback=motion_detected)
