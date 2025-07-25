@@ -7,7 +7,7 @@
 #define ALARM_PIN 15
 #define SIGNAL_PIN 1
 absolute_time_t lastTriger;
-
+bool motionDetecton=false;
 void initGpio(){
     gpio_init(PIR_PIN);
     gpio_set_dir(PIR_PIN,GPIO_IN);
@@ -19,28 +19,33 @@ void initGpio(){
     gpio_set_dir(SIGNAL_PIN,GPIO_OUT);
     gpio_put(SIGNAL_PIN,0);
 }
-void detectMotion(){
+void detectMotion(uint gpio, uint32_t events){
     absolute_time_t now=get_absolute_time();
-    if(gpio_get(PIR_PIN) && absolute_time_diff_us(lastTriger,now)>2*1000 *10){
-        gpio_put(ALARM_PIN,1);
-        gpio_put(LED_PIN,1);
-        gpio_put(SIGNAL_PIN,1);
-        sleep_ms(100);
+    if(absolute_time_diff_us(lastTriger,now)>2*1000*10){
         lastTriger=now;
-        gpio_put(ALARM_PIN,0);
-        gpio_put(LED_PIN,0);
-        gpio_put(SIGNAL_PIN,0);
+        motionDetecton=true;
     }
 }
 int main()
 {
     stdio_init_all();
-
+    sleep_ms(1000); 
     initGpio();
+    
     lastTriger=get_absolute_time();
+    gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
     while(true){
+        if(motionDetecton){
+            motionDetecton=false;
+            gpio_put(ALARM_PIN,1);
+            gpio_put(LED_PIN,1);
+            gpio_put(SIGNAL_PIN,1);
+            sleep_ms(500);
+            gpio_put(ALARM_PIN,0);
+            gpio_put(LED_PIN,0);
+            gpio_put(SIGNAL_PIN,0);
+        }
         tight_loop_contents();
-        detectMotion();
         sleep_ms(10);
     }
 }
