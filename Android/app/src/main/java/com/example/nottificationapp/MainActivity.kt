@@ -34,6 +34,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.messaging.FirebaseMessaging
 
 
 class MainActivity : ComponentActivity() {
@@ -97,6 +98,14 @@ fun IntrusionList(events: List<Event>){
 }
 @Composable
 fun MainScreen(modifier: Modifier = Modifier){
+    FirebaseMessaging.getInstance().subscribeToTopic("alerts")
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("FCM", "Subscribed to topic 'alerts'")
+            } else {
+                Log.e("FCM", "Subscription failed", task.exception)
+            }
+        }
     var events by remember { mutableStateOf<List<Event>>(emptyList()) }
     LaunchedEffect(Unit) {
         fetchIntrusionEvents {

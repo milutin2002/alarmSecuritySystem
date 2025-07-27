@@ -42,11 +42,11 @@ android {
 
 dependencies {
 
+    implementation("com.google.firebase:firebase-messaging:23.4.1")
     implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-database")
     implementation("io.coil-kt:coil-compose:2.4.0")
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
