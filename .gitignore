@@ -1,1 +1,12 @@
 AlarmSystem/build
+PI/.env
+PI/bin
+PI/include
+PI/lib
+PI/lib64
+PI/surveilence-55d76-firebase-adminsdk-fbsvc-1a22a8f240.json
+PI/pyvenv.cfg
+PI/venv
+/build
+google-services.json
+PI/surveilence-55d76-28b6282b85cf.json
