@@ -6,6 +6,14 @@ import firebase_admin
 from firebase_admin import credentials, storage, db
 import cv2 as cv
 from datetime import datetime
+from pyfcm import FCMNotification
+from firebase_admin import credentials, messaging
+
+
+load_dotenv()
+
+
+api_key_var=os.getenv("API_KEY")
 
 
 #GPIO setup
@@ -22,11 +30,24 @@ def capture_image():
 	return filename
 
 def firebase_upload(image_path):
+	global api_key
 	bucket= storage.bucket()
 	blob=bucket.blob(f"captured_images/{os.path.basename(image_path)}")
 	blob.upload_from_filename(image_path)
 	blob.make_public()
 	image_url=blob.public_url
+	message = messaging.Message(
+    		notification=messaging.Notification(
+        	title="Motion detection",
+        	body="An intruder was detected"
+    		),
+    		data={  
+        	"image_url": image_url
+    		},
+    		topic="alerts"
+)
+	response=messaging.send(message)
+	print(response)
 	print(f"Image uploaded: {image_url}")
 	db.reference("events").push({
 		'timestamp':datetime.now().isoformat(),
@@ -43,8 +64,6 @@ def motion_detected(channel):
 	time.sleep(5)
 
 GPIO.add_event_detect(26,GPIO.RISING,callback=motion_detected)
-
-load_dotenv()
 
 
 #FIREBASE setup
