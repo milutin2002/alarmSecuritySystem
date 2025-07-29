@@ -3,40 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>alarmSecuritySystem</title>
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      line-height: 1.6;
-      padding: 2rem;
-      max-width: 900px;
-      margin: auto;
-    }
-    code {
-      background: #f4f4f4;
-      padding: 2px 4px;
-      border-radius: 4px;
-      font-family: monospace;
-    }
-    pre {
-      background: #f4f4f4;
-      padding: 1rem;
-      border-radius: 4px;
-      overflow-x: auto;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-bottom: 1rem;
-    }
-    th, td {
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      text-align: left;
-    }
-    h1, h2, h3 {
-      margin-top: 2rem;
-    }
-  </style>
 </head>
 <body>
 
