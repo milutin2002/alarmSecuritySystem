@@ -1,0 +1,11 @@
+# Requirements for Raspberry Pi (Python) part of alarmSecuritySystem
+# OpenCV is provided via apt (`sudo apt install python3-opencv`), so we do not list opencv-python here.
+
+RPi.GPIO
+firebase-admin
+python-dotenv
+numpy
+
+# Optional extras (uncomment if your script uses them)
+# requests>=2.31.0
+# pillow>=10.0.0
