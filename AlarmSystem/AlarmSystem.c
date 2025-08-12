@@ -29,21 +29,27 @@ void detectMotion(uint gpio, uint32_t events){
 int main()
 {
     stdio_init_all();
-    sleep_ms(1000); 
     initGpio();
+    sleep_ms(1000); 
     
     lastTriger=get_absolute_time();
-    gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
+    //gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
     while(true){
-        if(motionDetecton){
-            motionDetecton=false;
-            gpio_put(ALARM_PIN,1);
-            gpio_put(LED_PIN,1);
-            gpio_put(SIGNAL_PIN,1);
-            sleep_ms(500);
-            gpio_put(ALARM_PIN,0);
-            gpio_put(LED_PIN,0);
-            gpio_put(SIGNAL_PIN,0);
+        if(gpio_get(PIR_PIN)){
+            absolute_time_t now=get_absolute_time();
+        if(absolute_time_diff_us(lastTriger,now)>2*1000*10){
+                lastTriger=now;
+                gpio_put(ALARM_PIN,1);
+                gpio_put(LED_PIN,1);
+                gpio_put(SIGNAL_PIN,1);
+                sleep_ms(500);
+                gpio_put(ALARM_PIN,0);
+                gpio_put(LED_PIN,0);
+                gpio_put(SIGNAL_PIN,0);
+                //motionDetecton=true;
+                }
+            //motionDetecton=false;
+            
         }
         tight_loop_contents();
         sleep_ms(10);
