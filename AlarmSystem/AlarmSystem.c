@@ -1,11 +1,16 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
-
+#include "hardware/uart.h"
 
 #define PIR_PIN 17
 #define LED_PIN 13
 #define ALARM_PIN 15
 #define SIGNAL_PIN 1
+
+#define UART_PIN 0
+#define BAUD_RATE 115200
+#define UART_ID uart0
+
 absolute_time_t lastTriger;
 bool motionDetecton=false;
 void initGpio(){
@@ -19,6 +24,10 @@ void initGpio(){
     gpio_set_dir(SIGNAL_PIN,GPIO_OUT);
     gpio_put(SIGNAL_PIN,0);
 }
+void initUart(){
+    uart_init(UART_ID,BAUD_RATE);
+    gpio_set_function(UART_PIN,GPIO_FUNC_UART);
+}
 void detectMotion(uint gpio, uint32_t events){
     absolute_time_t now=get_absolute_time();
     if(absolute_time_diff_us(lastTriger,now)>2*1000*10){
@@ -26,12 +35,23 @@ void detectMotion(uint gpio, uint32_t events){
         motionDetecton=true;
     }
 }
+void uartSendBlocking(char *s){
+    while(*s){
+        while(!uart_is_writable(UART_ID)){
+            tight_loop_contents();
+        }
+        uart_putc_raw(UART_ID,*s);
+        s++;
+    }
+    uart_tx_wait_blocking(UART_ID);
+}
 int main()
 {
     stdio_init_all();
     initGpio();
-    sleep_ms(1000); 
-    
+    initUart();
+    sleep_ms(5000); 
+    uartSendBlocking("\n");
     lastTriger=get_absolute_time();
     //gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
     while(true){
@@ -41,11 +61,13 @@ int main()
                 lastTriger=now;
                 gpio_put(ALARM_PIN,1);
                 gpio_put(LED_PIN,1);
-                gpio_put(SIGNAL_PIN,1);
-                sleep_ms(500);
+                //gpio_put(SIGNAL_PIN,1);
+                //uartSendBlocking("Yes\n");
+                uart_puts(UART_ID,"Yes\n");
+                sleep_ms(2000);
                 gpio_put(ALARM_PIN,0);
                 gpio_put(LED_PIN,0);
-                gpio_put(SIGNAL_PIN,0);
+                //gpio_put(SIGNAL_PIN,0);
                 //motionDetecton=true;
                 }
             //motionDetecton=false;
