@@ -53,24 +53,23 @@ int main()
     sleep_ms(5000); 
     uartSendBlocking("\n");
     lastTriger=get_absolute_time();
-    //gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
+    gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
     while(true){
-        if(gpio_get(PIR_PIN)){
+        if(motionDetecton){
             absolute_time_t now=get_absolute_time();
-        if(absolute_time_diff_us(lastTriger,now)>2*1000*10){
-                lastTriger=now;
-                gpio_put(ALARM_PIN,1);
-                gpio_put(LED_PIN,1);
+            lastTriger=now;
+            gpio_put(ALARM_PIN,1);
+            gpio_put(LED_PIN,1);
                 //gpio_put(SIGNAL_PIN,1);
                 //uartSendBlocking("Yes\n");
-                uart_puts(UART_ID,"Yes\n");
-                sleep_ms(2000);
-                gpio_put(ALARM_PIN,0);
-                gpio_put(LED_PIN,0);
+            uart_puts(UART_ID,"Yes\n");
+            sleep_ms(2000);
+            gpio_put(ALARM_PIN,0);
+            gpio_put(LED_PIN,0);
                 //gpio_put(SIGNAL_PIN,0);
                 //motionDetecton=true;
-                }
-            //motionDetecton=false;
+        
+            motionDetecton=false;
             
         }
         tight_loop_contents();
