@@ -11,6 +11,8 @@
 #define BAUD_RATE 115200
 #define UART_ID uart0
 
+extern bool status;
+
 absolute_time_t lastTriger;
 bool motionDetecton=false;
 void initGpio(){

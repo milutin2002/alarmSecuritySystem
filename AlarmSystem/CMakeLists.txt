@@ -40,7 +40,7 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(AlarmSystem AlarmSystem.c )
+add_executable(AlarmSystem AlarmSystem.c wifi/wifi.c mqtt/mqtt.c)
 
 pico_set_program_name(AlarmSystem "AlarmSystem")
 pico_set_program_version(AlarmSystem "0.1")
@@ -69,5 +69,12 @@ target_link_libraries(AlarmSystem
         )
 
 target_compile_definitions(AlarmSystem PRIVATE LWIP_TIMEVAL_PRIVATE=0 LWIP_POSIX_SOCKETS_IO_NAMES=0 PICO_CYW43_ARCH_TREADSAFE_BACKGROUND=1)
+if(DEFINED WIFI_SSID)
+    target_compile_definitions(IotLedLight PRIVATE WIFI_SSID="${WIFI_SSID}")
+endif()
+
+if(DEFINED WIFI_PASS)
+    target_compile_definitions(IotLedLight PRIVATE WIFI_PASS="${WIFI_PASS}")
+endif()
 pico_add_extra_outputs(AlarmSystem)
 
