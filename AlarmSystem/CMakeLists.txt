@@ -27,6 +27,10 @@ set(PICO_BOARD pico_w CACHE STRING "Board type")
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
+SET(FREERTOS_CONFIG_FILE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/port/FreeRTOS-Kernel" CACHE STRING "Local Config")
+include_directories("${FREERTOS_CONFIG_FILE_DIRECTORY}") 
+include(FreeRTOS_Kernel_import.cmake)
+
 
 project(AlarmSystem C CXX ASM)
 
@@ -56,7 +60,7 @@ target_include_directories(AlarmSystem PRIVATE
 
 # Add any user requested libraries
 target_link_libraries(AlarmSystem 
-        
+        pico_stdlib FreeRTOS-Kernel-Heap4
         )
 
 pico_add_extra_outputs(AlarmSystem)
