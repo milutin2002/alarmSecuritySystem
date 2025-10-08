@@ -1,6 +1,5 @@
-#include <stdio.h>
-#include "pico/stdlib.h"
 #include "hardware/uart.h"
+#include "mqtt/mqtt.h"
 
 #define PIR_PIN 17
 #define LED_PIN 13
@@ -37,6 +36,23 @@ void detectMotion(uint gpio, uint32_t events){
         motionDetecton=true;
     }
 }
+void alarmTask(void * _){
+    while(true){
+        printf("Trying to detect\n");
+        if(motionDetecton && status){
+            absolute_time_t now=get_absolute_time();
+            lastTriger=now;
+            gpio_put(ALARM_PIN,1);
+            gpio_put(LED_PIN,1);
+            uart_puts(UART_ID,"Yes\n");
+            sleep_ms(2000);
+            gpio_put(ALARM_PIN,0);
+            gpio_put(LED_PIN,0);
+            motionDetecton=false;
+        }
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+}
 void uartSendBlocking(char *s){
     while(*s){
         while(!uart_is_writable(UART_ID)){
@@ -52,9 +68,16 @@ int main()
     stdio_init_all();
     initGpio();
     initUart();
-    sleep_ms(5000); 
+    sleep_ms(5000);
     uartSendBlocking("\n");
-    lastTriger=get_absolute_time();
+    printf("Starting app\n");
+    netEvents=xEventGroupCreate();
+    gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
+    xTaskCreate(wifiTask,"Wifi task",4096,NULL,tskIDLE_PRIORITY+4,NULL);
+    xTaskCreate(alarmTask,"Alarm task",256,NULL,tskIDLE_PRIORITY+1,NULL);
+    vTaskStartScheduler();
+    while(true){}
+    /*lastTriger=get_absolute_time();
     gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
     while(true){
         if(motionDetecton){
@@ -62,19 +85,14 @@ int main()
             lastTriger=now;
             gpio_put(ALARM_PIN,1);
             gpio_put(LED_PIN,1);
-                //gpio_put(SIGNAL_PIN,1);
-                //uartSendBlocking("Yes\n");
             uart_puts(UART_ID,"Yes\n");
             sleep_ms(2000);
             gpio_put(ALARM_PIN,0);
             gpio_put(LED_PIN,0);
-                //gpio_put(SIGNAL_PIN,0);
-                //motionDetecton=true;
-        
             motionDetecton=false;
             
         }
         tight_loop_contents();
         sleep_ms(10);
-    }
+    }*/
 }

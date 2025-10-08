@@ -70,11 +70,11 @@ target_link_libraries(AlarmSystem
 
 target_compile_definitions(AlarmSystem PRIVATE LWIP_TIMEVAL_PRIVATE=0 LWIP_POSIX_SOCKETS_IO_NAMES=0 PICO_CYW43_ARCH_TREADSAFE_BACKGROUND=1)
 if(DEFINED WIFI_SSID)
-    target_compile_definitions(IotLedLight PRIVATE WIFI_SSID="${WIFI_SSID}")
+    target_compile_definitions(AlarmSystem PRIVATE WIFI_SSID="${WIFI_SSID}")
 endif()
 
 if(DEFINED WIFI_PASS)
-    target_compile_definitions(IotLedLight PRIVATE WIFI_PASS="${WIFI_PASS}")
+    target_compile_definitions(AlarmSystem PRIVATE WIFI_PASS="${WIFI_PASS}")
 endif()
 pico_add_extra_outputs(AlarmSystem)
 

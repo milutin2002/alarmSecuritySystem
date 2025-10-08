@@ -19,6 +19,5 @@ static void onTopic(void *arg,const char *topic,u32_t len);
 static void onData(void *arg,const u8_t *data,u16_t len,u8_t flags);
 static void publishData(const char *data);
 static void onConnect(mqtt_client_t *client,void *arg,mqtt_connection_status_t st);
-void mqttTask( void * _);
 #endif
 

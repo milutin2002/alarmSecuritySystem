@@ -23,4 +23,5 @@ static EventGroupHandle_t netEvents;
 
 
 void wifiTask(void * param);
+void mqttTask( void * _);
 #endif
