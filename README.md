@@ -165,11 +165,11 @@ sudo raspi-config
 <ul>
   <li><img src="Pictures/physical.gif" alt="Raspberry Pi Capture" width="400" height=400></li>
   <li><img src="Pictures/android.GIF" alt="Android Event View" width="400" height=400></li>
+  <li><img src="Pictures/newUI.jpg" alt="New ui" width="400" height=700></li>
 </ul>
 
 <h2>📌 Future Work</h2>
 <ul>
-  <li>[ ] Add RTOS to Pico for multitasking</li>
   <li>[ ] Integrate SPI camera (e.g., Arducam OV2640)</li>
   <li>[ ] Secure user authentication (Firebase Auth)</li>
   <li>[ ] Offline storage and sync</li>
