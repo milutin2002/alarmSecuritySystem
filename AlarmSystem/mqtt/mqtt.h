@@ -10,8 +10,8 @@
 
 #define MQTT_HOST "broker.emqx.io"
 #define MQTT_PORT 1883
-#define TOPIC_SET "pico/led/set"
-#define TOPIC_STATUS "pico/led/status"
+#define TOPIC_SET "pico/alarm/set"
+#define TOPIC_STATUS "pico/alarm/status"
 
 static mqtt_client_t *mq=NULL;
 

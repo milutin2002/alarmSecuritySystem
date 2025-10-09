@@ -70,6 +70,7 @@ int main()
     initUart();
     sleep_ms(5000);
     uartSendBlocking("\n");
+    lastTriger=get_absolute_time();
     printf("Starting app\n");
     netEvents=xEventGroupCreate();
     gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
