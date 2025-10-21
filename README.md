@@ -10,16 +10,30 @@
   A smart motion-detection security system using Raspberry Pi Pico (C SDK), Raspberry Pi (Python), Firebase, and an Android app (Jetpack Compose). The system captures and sends real-time images when motion is detected.
 </p>
 
-<h2>🚀 Features</h2>
-<ul>
-  <li>🔌 PIR Motion Detection with Raspberry Pi Pico (C SDK)</li>
-  <li>📷 Raspberry Pi Camera Integration using OpenCV</li>
-  <li>☁️ Image Upload to Firebase Storage</li>
-  <li>🕒 Event Logging to Firebase Realtime Database</li>
-  <li>📲 Android App with Jetpack Compose</li>
-  <li>🔔 Push Notifications using Firebase Cloud Messaging (FCM)</li>
-  <li>🔄 Communication between Pico and Pi via GPIO</li>
-</ul>
+## Features
+
+### Core
+- **End-to-end alarm pipeline:** Pico W detects motion → Raspberry Pi captures image → uploads to **Firebase** → **Android** app receives a push and displays the evidence.  
+- **Remote control via MQTT:** The system can be **armed** or **disarmed** through MQTT messages (e.g., from the Android app).
+
+### Pico W (Firmware)
+- **Wi-Fi powered by FreeRTOS (CYW43 + lwIP):** Uses `pico_cyw43_arch_lwip_sys_freertos` so Wi-Fi and networking tasks run under FreeRTOS while main logic stays simple.  
+- **MQTT client support:** Subscribes to a control topic (e.g., `pico/alarm/set`) to toggle system state and publishes status updates.  
+- **Station mode (WPA2):** Auto-connects and reconnects to configured Wi-Fi SSID.   
+- **Configurable credentials:** SSID/password and MQTT broker address defined in a config header or build-time defines.
+
+### Raspberry Pi (Service)
+- **Capture on trigger:** Listens for Pico W GPIO or network signal and captures an image (OpenCV / Pi Camera).  
+- **Cloud upload:** Saves images to **Firebase Storage** and writes metadata to **Realtime Database**.  
+- **Push notifications:** Sends **FCM** alerts to Android clients with image and timestamp.  
+- **MQTT broker option:** Can host or relay MQTT messages for system control and status.
+
+### Android (App)
+- **Realtime alerts:** Receives Firebase Cloud Messaging notifications on motion events.  
+- **System control:** Sends MQTT messages to arm/disarm the alarm remotely.  
+- **Evidence viewer:** Displays captured images and event details.
+
+
 
 <h2>🧠 Architecture Overview</h2>
 <pre>
