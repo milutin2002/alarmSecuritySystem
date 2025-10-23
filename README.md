@@ -95,7 +95,7 @@ export PICO_SDK_PATH=$PWD/pico-sdk
 git clone https://github.com/milutin2002/alarmSecuritySystem.git
 cd alarmSecuritySystem/pico
 mkdir build && cd build
-cmake -DWIFI_SSID="<wifi_name>" -DWIFI_PASS="<wifi_password>" ..
+cmake -DWIFI_SSID="wifi_name" -DWIFI_PASS="wifi_password" ..
 make
     </code></pre>
   </li>
