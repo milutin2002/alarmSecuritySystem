@@ -44,10 +44,15 @@ void alarmTask(void * _){
             lastTriger=now;
             gpio_put(ALARM_PIN,1);
             gpio_put(LED_PIN,1);
-            uart_puts(UART_ID,"Yes\n");
+            //uart_puts(UART_ID,"Yes\n");
+            gpio_put(SIGNAL_PIN,0);
             sleep_ms(2000);
             gpio_put(ALARM_PIN,0);
             gpio_put(LED_PIN,0);
+            gpio_put(SIGNAL_PIN,1);
+            motionDetecton=false;
+        }
+        else if(!status){
             motionDetecton=false;
         }
         vTaskDelay(pdMS_TO_TICKS(100));
@@ -67,14 +72,15 @@ int main()
 {
     stdio_init_all();
     initGpio();
-    initUart();
+    //initUart();
     sleep_ms(5000);
-    uartSendBlocking("\n");
+    //uartSendBlocking("\n");
     lastTriger=get_absolute_time();
     printf("Starting app\n");
     netEvents=xEventGroupCreate();
     gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
-    xTaskCreate(wifiTask,"Wifi task",4096,NULL,tskIDLE_PRIORITY+4,NULL);
+    xTaskCreate(wifiTask,"Wifi task",256,NULL,tskIDLE_PRIORITY+4,NULL);
+    //xTaskCreate(mqttTask,"Mqtt task",256,NULL,tskIDLE_PRIORITY+1,NULL);
     xTaskCreate(alarmTask,"Alarm task",256,NULL,tskIDLE_PRIORITY+1,NULL);
     vTaskStartScheduler();
     while(true){}
