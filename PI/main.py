@@ -9,6 +9,7 @@ from datetime import datetime
 from pyfcm import FCMNotification
 from firebase_admin import credentials, messaging
 import serial
+from gpiozero import Button
 
 load_dotenv()
 
@@ -16,11 +17,11 @@ load_dotenv()
 api_key_var=os.getenv("API_KEY")
 
 #serial config
-ser=serial.Serial("/dev/serial0",115200,timeout=1)
+#ser=serial.Serial("/dev/serial0",115200,timeout=1)
 
 #GPIO setup
-#GPIO.setmode(GPIO.BCM)
-#GPIO.setup(26,GPIO.IN,pull_up_down=GPIO.PUD_DOWN)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(26,GPIO.IN,pull_up_down=GPIO.PUD_DOWN)
 
 def capture_image():
 	cam=cv.VideoCapture(0)
@@ -58,7 +59,7 @@ def firebase_upload(image_path):
 def remove_file(image_path):
 	os.remove(image_path)
 
-def motion_detected():
+def motion_detected(channel):
 	print("Capturing image\n")
 	image_path=capture_image()
 	firebase_upload(image_path)
@@ -80,13 +81,12 @@ firebase_admin.initialize_app(cred,{
 	'databaseURL':firebase_db
 })
 
-
 try:
+	GPIO.add_event_detect(26,GPIO.RISING,callback=motion_detected,bouncetime=200)
+	print("Added event")
+	#motion_sensor=Button(26,pull_up=False)
+	#motion_sensor.when_pressed=motion_detected
 	while True:
-		data=ser.readline().decode(errors="ignore").strip()
-		if data and data=="Yes":
-			print(data)
-			motion_detected()
-		time.sleep(1)
+		pass
 except KeyboardInterrupt:
 	GPIO.cleanup()
