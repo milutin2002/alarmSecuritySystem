@@ -12,6 +12,7 @@
 #define MQTT_PORT 1883
 #define TOPIC_SET "pico/alarm/set"
 #define TOPIC_STATUS "pico/alarm/status"
+#define TOPIC_STREAM "pico/stream/set"
 
 static mqtt_client_t *mq=NULL;
 

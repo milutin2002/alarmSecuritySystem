@@ -11,6 +11,7 @@
 #define UART_ID uart0
 
 extern bool status;
+extern bool stream;
 
 absolute_time_t lastTriger;
 bool motionDetecton=false;
@@ -39,7 +40,7 @@ void detectMotion(uint gpio, uint32_t events){
 void alarmTask(void * _){
     while(true){
         printf("Trying to detect\n");
-        if(motionDetecton && status){
+        if(motionDetecton && status && !stream){
             absolute_time_t now=get_absolute_time();
             lastTriger=now;
             gpio_put(ALARM_PIN,1);
@@ -52,7 +53,7 @@ void alarmTask(void * _){
             gpio_put(SIGNAL_PIN,1);
             motionDetecton=false;
         }
-        else if(!status){
+        else if(!status || stream){
             motionDetecton=false;
         }
         vTaskDelay(pdMS_TO_TICKS(100));

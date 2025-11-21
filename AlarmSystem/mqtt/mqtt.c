@@ -2,14 +2,24 @@
 
 bool status=true;
 
+bool stream=false;
+
+static char currentTopic[64];
 
 static void onTopic(void *arg,const char *topic,u32_t len){
     printf("MQTT incoming topic %s\n",topic);
+    strcpy(currentTopic,topic);
+    currentTopic[len]='\0';
 }
 static void onData(void *arg,const u8_t *data,u16_t len,u8_t flags){
     char buf[8];
-    status=!status;
-    publishData(status?"ON":"OFF");
+    if(strcmp(currentTopic,TOPIC_SET)==0){
+        status=!status;
+        publishData(status?"ON":"OFF");
+    }
+    else if(strcmp(currentTopic,TOPIC_STREAM)==0){
+        stream= (strcmp(data,"ON")==0)?true:false;
+    }
 }
 static void publishData(const char *data){
     if(mqtt_client_is_connected(mq)){
@@ -21,6 +31,7 @@ static void onConnect(mqtt_client_t *client,void *arg,mqtt_connection_status_t s
         printf("MQTT connected\n");
         mqtt_set_inpub_callback(mq,onTopic,onData,NULL);
         mqtt_subscribe(mq,TOPIC_SET,0,NULL,NULL);
+        mqtt_subscribe(mq,TOPIC_STREAM,0,NULL,NULL);
     }
     else{
         printf("Mqtt connection failed\n");
