@@ -51,8 +51,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             channel.enableVibration(true)
             notificationManager.createNotificationChannel(channel)
         }
-
-        // Optional: navigate to activity when tapped
         val intent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT

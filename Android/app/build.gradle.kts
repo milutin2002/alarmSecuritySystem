@@ -18,6 +18,18 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    packaging {
+        resources {
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/io.netty.versions.properties"
+            // (optional, if you hit more duplicates)
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/NOTICE.txt"
+        }
+    }
 
     buildTypes {
         release {
@@ -55,6 +67,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -62,4 +76,10 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("com.hivemq:hivemq-mqtt-client:1.3.9")
+    implementation(platform("com.hivemq:hivemq-mqtt-client-websocket:1.3.9"))
+    implementation(platform("com.hivemq:hivemq-mqtt-client-proxy:1.3.9"))
+    implementation(platform("com.hivemq:hivemq-mqtt-client-epoll:1.3.9"))
+    implementation("com.hivemq:hivemq-mqtt-client-reactor:1.3.9")
+
 }
