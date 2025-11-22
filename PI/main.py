@@ -48,7 +48,11 @@ def stream():
 			)
 
 def capture_image():
-	ret,image=cam.read()
+	image=None
+	while image is None:
+		ret,image=cam.read()
+		if not ret:
+			image=None
 	timestamp=datetime.now().strftime("%Y%m%d_%H%M%S")
 	filename=f"/home/milutin/alarmSecuritySystem/PI/{timestamp}.jpg"
 	cv.imwrite(filename,image)
