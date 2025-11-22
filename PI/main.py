@@ -9,26 +9,53 @@ from datetime import datetime
 from pyfcm import FCMNotification
 from firebase_admin import credentials, messaging
 import serial
+from gpiozero import Button
+from flask import Flask, Response
 
 load_dotenv()
+
+cam=cv.VideoCapture(0)
+
+
+app=Flask(__name__)
+
 
 
 api_key_var=os.getenv("API_KEY")
 
 #serial config
-ser=serial.Serial("/dev/serial0",115200,timeout=1)
+#ser=serial.Serial("/dev/serial0",115200,timeout=1)
 
 #GPIO setup
-#GPIO.setmode(GPIO.BCM)
-#GPIO.setup(26,GPIO.IN,pull_up_down=GPIO.PUD_DOWN)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(26,GPIO.IN,pull_up_down=GPIO.PUD_DOWN)
+
+def generateFrame():
+	while True:
+		ret,frame=cam.read()
+		if not ret:
+			continue
+		ret,jpeg = cv.imencode(".jpg",frame)
+		bytes=jpeg.tobytes()
+		yield (b"--frame\r\n"+
+		b"Content-Type: image/jpeg\r\n\r\n"+
+		bytes+b"\r\n")
+
+@app.route('/stream')
+def stream():
+	return Response(generateFrame(),
+			mimetype='multipart/x-mixed-replace; boundary=frame'
+			)
 
 def capture_image():
-	cam=cv.VideoCapture(0)
-	ret,image=cam.read()
+	image=None
+	while image is None:
+		ret,image=cam.read()
+		if not ret:
+			image=None
 	timestamp=datetime.now().strftime("%Y%m%d_%H%M%S")
 	filename=f"/home/milutin/alarmSecuritySystem/PI/{timestamp}.jpg"
 	cv.imwrite(filename,image)
-	cam.release()
 	return filename
 
 def firebase_upload(image_path):
@@ -58,7 +85,7 @@ def firebase_upload(image_path):
 def remove_file(image_path):
 	os.remove(image_path)
 
-def motion_detected():
+def motion_detected(channel):
 	print("Capturing image\n")
 	image_path=capture_image()
 	firebase_upload(image_path)
@@ -80,13 +107,14 @@ firebase_admin.initialize_app(cred,{
 	'databaseURL':firebase_db
 })
 
-
-try:
-	while True:
-		data=ser.readline().decode(errors="ignore").strip()
-		if data and data=="Yes":
-			print(data)
-			motion_detected()
-		time.sleep(1)
-except KeyboardInterrupt:
-	GPIO.cleanup()
+if __name__ == "__main__":
+	try:
+		GPIO.add_event_detect(26,GPIO.RISING,callback=motion_detected,bouncetime=200)
+		print("Added event")
+		app.run(host="0.0.0.0",port=8080,threaded=True)
+		#motion_sensor=Button(26,pull_up=False)
+		#motion_sensor.when_pressed=motion_detected
+		while True:
+			pass
+	except KeyboardInterrupt:
+		GPIO.cleanup()
