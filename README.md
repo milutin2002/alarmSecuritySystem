@@ -182,12 +182,7 @@ sudo raspi-config
   <li><img src="Pictures/newUI.jpg" alt="New ui" width="400" height=700></li>
 </ul>
 
-<h2>📌 Future Work</h2>
-<ul>
-  <li>[ ] Integrate SPI camera (e.g., Arducam OV2640)</li>
-  <li>[ ] Secure user authentication (Firebase Auth)</li>
-  <li>[ ] Offline storage and sync</li>
-</ul>
+
 
 <h2>🧠 Goals</h2>
 <ul>
