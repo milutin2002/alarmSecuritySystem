@@ -7,12 +7,13 @@ bool stream=false;
 static char currentTopic[64];
 
 static void onTopic(void *arg,const char *topic,u32_t len){
-    printf("MQTT incoming topic %s\n",topic);
+    printf("MQTT incoming topic %s\n and len is %d",topic,len);
     strcpy(currentTopic,topic);
-    currentTopic[len]='\0';
+    currentTopic[strlen(topic)]='\0';
 }
 static void onData(void *arg,const u8_t *data,u16_t len,u8_t flags){
     char buf[8];
+    printf("Handling topis %s\n",currentTopic);
     if(strcmp(currentTopic,TOPIC_SET)==0){
         status=!status;
         publishData(status?"ON":"OFF");
@@ -58,7 +59,7 @@ void mqttTask( void * _){
     ci.client_id="pico-led-1";
     ci.keep_alive=30;
     ci.will_topic=TOPIC_STATUS;
-    ci.will_msg="OFF";
+    ci.will_msg="ON";
     ci.will_qos=0;
     ci.will_retain=1;
     while(true){

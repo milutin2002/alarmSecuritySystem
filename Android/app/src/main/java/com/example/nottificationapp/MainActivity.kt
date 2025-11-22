@@ -47,6 +47,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
@@ -55,6 +56,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.nottificationapp.Models.Event
+import com.example.nottificationapp.Screens.MainScreen
+import com.example.nottificationapp.Screens.StreamScreen
+import com.example.nottificationapp.ViewModels.MainViewModel
 
 import com.example.nottificationapp.ui.theme.NottificationAppTheme
 import com.google.firebase.Firebase
@@ -85,32 +89,17 @@ class MainActivity : ComponentActivity() {
         setContent {
             NottificationAppTheme {
                 val navController=rememberNavController()
+                val mainViewModel : MainViewModel = viewModel()
                 val tabs=listOf(Route.Home, Route.Stream)
                 Scaffold(modifier = Modifier.fillMaxSize(),{appTopBar(navController)}, bottomBar = {appBottomBar(navController,tabs)}) { innerPadding ->
-                    var statusConnection by remember { mutableStateOf<String?>(null) }
-                    val broker =  "broker.emqx.io"
-                    var statusText by remember { mutableStateOf<String?>(null) }
-                    LaunchedEffect(Unit) {
-                        MqttController.createClient(broker,brokerPort=8883)
-                        MqttController.connect(onConnected = {
-                            Log.i("Connection","Connection established")
-                            statusConnection="Connected"
-                            MqttController.subscribeStatus(onMessage = { data->
-                                statusText=data
-                            }, onError = {
-                                statusConnection="Error during subscription"
-                            })
-                        }, onError = {
-                            statusConnection="Error during connection"
-                        })
-                    }
+
                     //MainScreen(statusConnection=statusConnection.toString())
                     NavHost(navController=navController,startDestination= Route.Home.route,modifier= Modifier.padding(innerPadding)){
                         composable(Route.Home.route){
-                            MainScreen(statusConnection=statusConnection.toString())
+                            MainScreen(viewModel = mainViewModel)
                         }
                         composable(Route.Stream.route) {
-                            streamScreen()
+                            StreamScreen()
                         }
                     }
                 }
@@ -136,35 +125,7 @@ fun appTopBar(navController:NavHostController){
     )
 }
 
-@Composable
-fun streamScreen(){
-    val context = LocalContext.current
-    Column(modifier = Modifier.fillMaxSize()) {
-        AndroidView(modifier = Modifier.fillMaxWidth().weight(1f).padding(12.dp), factory = {
-            WebView(context).apply {
-                layoutParams= ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-                webViewClient= WebViewClient()
-                settings.apply {
-                    javaScriptEnabled = false  // MJPEG doesn't need JS
-                    domStorageEnabled = false
-                    cacheMode = WebSettings.LOAD_NO_CACHE
-                    useWideViewPort = true
-                    loadWithOverviewMode = true
-                    builtInZoomControls = false
-                    displayZoomControls = false
-                    mediaPlaybackRequiresUserGesture = false
-                }
-                loadUrl("http://192.168.0.36:8080/stream")
-            }
-        }, update = {
-            webView ->
-            if(webView.url!="http://192.168.0.36:8080/stream"){
-                webView.loadUrl("http://192.168.0.36:8080/stream")
-            }
-        })
 
-    }
-}
 @Composable
 fun appBottomBar(navController: NavController,tabs:List<MainActivity.Route>){
     val route=currentRoute(navController)
@@ -182,79 +143,4 @@ fun appBottomBar(navController: NavController,tabs:List<MainActivity.Route>){
         }
     }
 }
-fun fetchIntrusionEvents(onResult:(List<Event>)->Unit){
-    val database=FirebaseDatabase.getInstance()
-    val ref=database.getReference("events")
-    ref.addListenerForSingleValueEvent(object :ValueEventListener{
-        override fun onDataChange(snapshot: DataSnapshot) {
-            val list= mutableListOf<Event>()
-            for(child in snapshot.children){
-                val event=child.getValue(Event::class.java)
-                event?.let { list.add(it) }
-            }
-            onResult(list.reversed())
-        }
 
-        override fun onCancelled(error: DatabaseError) {
-            Log.e("Error","Canceled")
-        }
-
-    })
-}
-@Composable
-fun IntrusionList(events: List<Event>){
-    LazyColumn {
-        items(events) { event ->
-            Card(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()
-                    .clickable {
-
-                    }
-            ) {
-                Column(modifier = Modifier.padding(8.dp)) {
-                    Text("Time: ${event.timestamp}")
-                    AsyncImage(
-                        model = event.image_url,
-                        contentDescription = null,
-                        modifier = Modifier.height(200.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-@Composable
-fun MainScreen(modifier: Modifier = Modifier,statusConnection: String){
-    FirebaseMessaging.getInstance().subscribeToTopic("alerts")
-        .addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d("FCM", "Subscribed to topic 'alerts'")
-            } else {
-                Log.e("FCM", "Subscription failed", task.exception)
-            }
-        }
-    var events by remember { mutableStateOf<List<Event>>(emptyList()) }
-    var status by remember { mutableStateOf<Boolean>(false) }
-    var statusText by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(Unit) {
-
-        fetchIntrusionEvents {
-            events=it
-        }
-    }
-    Column(Modifier.padding(20.dp)) {
-        Text(text = "Connection status: $statusConnection")
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)){
-            Button(onClick = {
-                MqttController.publishData{
-                }
-            },modifier= Modifier.weight(1f)) {
-                Text(text = "Turn on/off")
-            }
-        }
-        Text(text = "Security status: $statusText")
-        IntrusionList(events)
-    }
-}
