@@ -15,6 +15,8 @@ extern bool stream;
 
 absolute_time_t lastTriger;
 bool motionDetecton=false;
+EventGroupHandle_t netEvents;
+
 void initGpio(){
     gpio_init(PIR_PIN);
     gpio_set_dir(PIR_PIN,GPIO_IN);
@@ -81,7 +83,7 @@ int main()
     netEvents=xEventGroupCreate();
     gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
     xTaskCreate(wifiTask,"Wifi task",256,NULL,tskIDLE_PRIORITY+4,NULL);
-    //xTaskCreate(mqttTask,"Mqtt task",256,NULL,tskIDLE_PRIORITY+1,NULL);
+    xTaskCreate(mqttTask,"Mqtt task",256,NULL,tskIDLE_PRIORITY+1,NULL);
     xTaskCreate(alarmTask,"Alarm task",256,NULL,tskIDLE_PRIORITY+1,NULL);
     vTaskStartScheduler();
     while(true){}

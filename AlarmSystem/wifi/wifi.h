@@ -11,7 +11,7 @@
 
 #define NET_READY_BIT (1U << 0)
 
-static EventGroupHandle_t netEvents;
+extern EventGroupHandle_t netEvents;
 
 #ifndef WIFI_SSID
 #define WIFI_SSID "Change me"

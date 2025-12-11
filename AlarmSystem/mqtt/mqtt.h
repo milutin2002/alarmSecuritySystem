@@ -16,6 +16,8 @@
 
 static mqtt_client_t *mq=NULL;
 
+extern EventGroupHandle_t netEvents;
+
 static void onTopic(void *arg,const char *topic,u32_t len);
 static void onData(void *arg,const u8_t *data,u16_t len,u8_t flags);
 static void publishData(const char *data);
