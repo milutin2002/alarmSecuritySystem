@@ -50,7 +50,7 @@ fun StreamScreen(){
                 webView.loadUrl("http://192.168.0.36:8080/stream")
             }
         })
-        Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
+        Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()){
           IconButton(onClick ={
               MqttController.publishData("pico/servo/left", onError = {
                   Log.e("Error",it.message.toString())
