@@ -40,7 +40,7 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(AlarmSystem AlarmSystem.c wifi/wifi.c mqtt/mqtt.c)
+add_executable(AlarmSystem AlarmSystem.c wifi/wifi.c mqtt/mqtt.c servo/servo.c)
 
 pico_set_program_name(AlarmSystem "AlarmSystem")
 pico_set_program_version(AlarmSystem "0.1")
@@ -65,7 +65,7 @@ target_include_directories(AlarmSystem PRIVATE
 # Add any user requested libraries
 target_link_libraries(AlarmSystem 
         pico_stdlib FreeRTOS-Kernel-Heap4
-        pico_lwip_mqtt pico_cyw43_arch_lwip_sys_freertos
+        pico_lwip_mqtt pico_cyw43_arch_lwip_sys_freertos hardware_pwm
         )
 
 target_compile_definitions(AlarmSystem PRIVATE LWIP_TIMEVAL_PRIVATE=0 LWIP_POSIX_SOCKETS_IO_NAMES=0 PICO_CYW43_ARCH_TREADSAFE_BACKGROUND=1)

@@ -1,5 +1,6 @@
 #include "hardware/uart.h"
 #include "mqtt/mqtt.h"
+#include "servo/servo.h"
 
 #define PIR_PIN 17
 #define LED_PIN 13
@@ -71,6 +72,49 @@ void uartSendBlocking(char *s){
     }
     uart_tx_wait_blocking(UART_ID);
 }
+
+bool direction=true;
+int currentMills1=400,currentMills2=1600;
+#define SERVO_PIN1 12
+#define SERVO_PIN2 11
+
+
+
+void servoTask(void *){
+    while(true){
+        enum Action cmd=LEFT;
+        BaseType_t res=xQueueReceive(queue,&cmd,0);
+        if(res==pdTRUE){
+            if(cmd==LEFT){
+                if(currentMills1<2400){
+                    currentMills1+=50;
+                }
+                setMills(SERVO_PIN1,currentMills1);
+            }
+            else if(cmd==RIGHT){
+                if(currentMills1>400){
+                    currentMills1-=50;
+                }
+                setMills(SERVO_PIN1,currentMills1);
+            }
+            else if(cmd==UP){
+                printf("Increasing height\n");
+                /*if(currentMills2<2400){
+                    currentMills2+=50;
+                }*/
+                //setMills(SERVO_PIN2,currentMills2);
+            }
+            else{
+                /*if(currentMills2>400){
+                    currentMills2-=50;
+                }
+                setMills(SERVO_PIN2,currentMills2);*/
+            }
+            
+        }
+        sleep_ms(100);
+    }
+}
 int main()
 {
     stdio_init_all();
@@ -81,10 +125,13 @@ int main()
     lastTriger=get_absolute_time();
     printf("Starting app\n");
     netEvents=xEventGroupCreate();
+    setServo(SERVO_PIN1,currentMills1);
+    queue=xQueueCreate(COUNT_QUEUE_LEN,sizeof(enum Action));
     gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
-    xTaskCreate(wifiTask,"Wifi task",256,NULL,tskIDLE_PRIORITY+4,NULL);
+    xTaskCreate(wifiTask,"Wifi task",256,NULL,tskIDLE_PRIORITY+1,NULL);
     xTaskCreate(mqttTask,"Mqtt task",256,NULL,tskIDLE_PRIORITY+1,NULL);
     xTaskCreate(alarmTask,"Alarm task",256,NULL,tskIDLE_PRIORITY+1,NULL);
+    xTaskCreate(servoTask,"Servo task",256,NULL,tskIDLE_PRIORITY+1,NULL);
     vTaskStartScheduler();
     while(true){}
     /*lastTriger=get_absolute_time();

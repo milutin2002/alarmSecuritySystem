@@ -14,7 +14,20 @@
 #define TOPIC_STATUS "pico/alarm/status"
 #define TOPIC_STREAM "pico/stream/set"
 
+#define TOPIC_LEFT "pico/servo/left"
+#define TOPIC_RIGHT "pico/servo/right"
+#define TOPIC_UP "pico/servo/up"
+#define TOPIC_DOWN "pico/servo/down"
+
+#define COUNT_QUEUE_LEN 	10
+
 static mqtt_client_t *mq=NULL;
+
+extern QueueHandle_t queue;
+
+enum Action{
+    LEFT,RIGHT,UP,DOWN
+};
 
 extern EventGroupHandle_t netEvents;
 
