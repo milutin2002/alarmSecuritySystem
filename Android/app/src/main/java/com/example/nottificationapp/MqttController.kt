@@ -57,9 +57,9 @@ object MqttController {
         }
     }
 
-    fun publishData(onError: (Throwable) -> Unit){
+    fun publishData(topic:String,onError: (Throwable) -> Unit){
         val c=client?: return onError(IllegalStateException("Client not created"))
-        c.publishWith().topic(topicSet).qos(MqttQos.AT_MOST_ONCE).payload("ON".toByteArray(
+        c.publishWith().topic(topic).qos(MqttQos.AT_MOST_ONCE).payload("ON".toByteArray(
             StandardCharsets.UTF_8)).send().whenComplete { _,t->{
             if(t!=null){
                 onError(t)

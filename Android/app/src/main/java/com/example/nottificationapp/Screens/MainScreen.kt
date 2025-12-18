@@ -21,6 +21,7 @@ import coil.compose.AsyncImage
 import com.example.nottificationapp.Models.Event
 import com.example.nottificationapp.MqttController
 import com.example.nottificationapp.ViewModels.MainViewModel
+import com.example.nottificationapp.topicSet
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -63,7 +64,7 @@ fun MainScreen(modifier: Modifier = Modifier,viewModel: MainViewModel = viewMode
         Text(text = "Connection status: $statusConnection")
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)){
             Button(onClick = {
-                MqttController.publishData{
+                MqttController.publishData(topic = topicSet){
                 }
             },modifier= Modifier.weight(1f)) {
                 Text(text = "Turn on/off")
