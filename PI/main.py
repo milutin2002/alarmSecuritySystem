@@ -11,11 +11,14 @@ from firebase_admin import credentials, messaging
 import serial
 from gpiozero import Button
 from flask import Flask, Response
+from picamera2 import Picamera2
 
 load_dotenv()
 
-cam=cv.VideoCapture(0)
-
+#cam=cv.VideoCapture(0)
+camera=Picamera2()
+camera.start()
+time.sleep(1)
 
 app=Flask(__name__)
 
@@ -32,9 +35,11 @@ GPIO.setup(26,GPIO.IN,pull_up_down=GPIO.PUD_DOWN)
 
 def generateFrame():
 	while True:
-		ret,frame=cam.read()
-		if not ret:
-			continue
+		#ret,frame=cam.read()
+		#if not ret:
+		#	continue
+		frame=camera.capture_array()
+		frame=cv.cvtColor(frame,cv.COLOR_RGB2BGR)
 		ret,jpeg = cv.imencode(".jpg",frame)
 		bytes=jpeg.tobytes()
 		yield (b"--frame\r\n"+
@@ -49,13 +54,15 @@ def stream():
 
 def capture_image():
 	image=None
-	while image is None:
-		ret,image=cam.read()
-		if not ret:
-			image=None
+	#while image is None:
+	#	ret,image=cam.read()
+	#	if not ret:
+	#		image=None
 	timestamp=datetime.now().strftime("%Y%m%d_%H%M%S")
 	filename=f"/home/milutin/alarmSecuritySystem/PI/{timestamp}.jpg"
-	cv.imwrite(filename,image)
+	time.sleep(1)
+	camera.capture_file(filename)
+	#cv.imwrite(filename,image)
 	return filename
 
 def firebase_upload(image_path):
