@@ -12,6 +12,7 @@ import serial
 from gpiozero import Button
 from flask import Flask, Response
 from picamera2 import Picamera2
+import threading
 
 load_dotenv()
 
@@ -19,6 +20,7 @@ load_dotenv()
 camera=Picamera2()
 camera.start()
 time.sleep(1)
+lock=threading.Lock()
 
 app=Flask(__name__)
 
@@ -38,7 +40,8 @@ def generateFrame():
 		#ret,frame=cam.read()
 		#if not ret:
 		#	continue
-		frame=camera.capture_array()
+		with lock:
+			frame=camera.capture_array()
 		frame=cv.cvtColor(frame,cv.COLOR_RGB2BGR)
 		ret,jpeg = cv.imencode(".jpg",frame)
 		bytes=jpeg.tobytes()
@@ -61,7 +64,8 @@ def capture_image():
 	timestamp=datetime.now().strftime("%Y%m%d_%H%M%S")
 	filename=f"/home/milutin/alarmSecuritySystem/PI/{timestamp}.jpg"
 	time.sleep(1)
-	camera.capture_file(filename)
+	with lock:
+		camera.capture_file(filename)
 	#cv.imwrite(filename,image)
 	return filename
 
