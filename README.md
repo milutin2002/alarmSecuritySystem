@@ -181,6 +181,7 @@ sudo raspi-config
   <li><img src="Pictures/android.GIF" alt="Android Event View" width="400" height=400></li>
   <li><img src="Pictures/newUI.jpg" alt="New ui" width="400" height=700></li>
   <li><img src="Pictures/stream.gif" alt="New ui" width="400" height=700></li>
+  <li><img src="Pictures/rotateCamera.gif" alt="New ui"></li>
 </ul>
 
 
