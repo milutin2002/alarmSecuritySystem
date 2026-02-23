@@ -7,7 +7,7 @@
 
 <h1>🔐 alarmSecuritySystem</h1>
 <p>
-  A smart motion-detection security system using Raspberry Pi Pico (C SDK), Raspberry Pi (Python), Firebase, and an Android app (Jetpack Compose). The system captures and sends real-time images when motion is detected.
+  Designed and implemented an IoT security camera system using Raspberry Pi Pico (C SDK), Raspberry Pi (Python/Flask), Firebase, and Android (Jetpack Compose). The system performs real-time motion detection with instant mobile alerts and snapshots, supports live video streaming via a Flask server, and allows remote camera pan control from the Android app through a Pico-driven motorized mount.
 </p>
 
 ## Features
@@ -15,41 +15,57 @@
 ### Core
 - **End-to-end alarm pipeline:** Pico W detects motion → Raspberry Pi captures image → uploads to **Firebase** → **Android** app receives a push and displays the evidence.  
 - **Remote control via MQTT:** The system can be **armed** or **disarmed** through MQTT messages (e.g., from the Android app).
+- **Integrated live surveillance:** Real-time camera streaming to the Android app from the Raspberry Pi Flask server.
+- **Motorized pan control:** Users can remotely rotate the camera from the mobile UI; commands propagate Pi → Pico W → motor driver
 
 ### Pico W (Firmware)
 - **Wi-Fi powered by FreeRTOS (CYW43 + lwIP):** Uses `pico_cyw43_arch_lwip_sys_freertos` so Wi-Fi and networking tasks run under FreeRTOS while main logic stays simple.  
-- **MQTT client support:** Subscribes to a control topic (e.g., `pico/alarm/set`) to toggle system state and publishes status updates.  
+- **MQTT client support:** Subscribes to a control topic (e.g., `pico/alarm/set`) to toggle system state and publishes status updates.
+- **Motorized camera rotor control:** Drives the pan motor via GPIO/PWM, executing rotation commands received over MQTT from the Raspberry Pi/Android app.
 - **Station mode (WPA2):** Auto-connects and reconnects to configured Wi-Fi SSID.   
 - **Configurable credentials:** SSID/password and MQTT broker address defined in a config header or build-time defines.
 
 ### Raspberry Pi (Service)
 - **Capture on trigger:** Listens for Pico W GPIO or network signal and captures an image (OpenCV / Pi Camera).  
 - **Cloud upload:** Saves images to **Firebase Storage** and writes metadata to **Realtime Database**.  
-- **Push notifications:** Sends **FCM** alerts to Android clients with image and timestamp.  
-- **MQTT broker option:** Can host or relay MQTT messages for system control and status.
+- **Push notifications:** Sends **FCM** alerts to Android clients with image and timestamp.
+- **Flask live streaming server:** Provides real-time MJPEG/HTTP video stream consumed by the Android app for live surveillance.
 
 ### Android (App)
 - **Realtime alerts:** Receives Firebase Cloud Messaging notifications on motion events.  
 - **System control:** Sends MQTT messages to arm/disarm the alarm remotely.  
 - **Evidence viewer:** Displays captured images and event details.
+- **Live surveillance:** Streams real-time video from the Raspberry Pi Flask server directly in the app.
+- **Remote camera rotation:** Provides on-screen controls to rotate the camera; commands are sent via MQTT to the Raspberry Pi → Pico W motor controller.
 
 
 
 <h2>🧠 Architecture Overview</h2>
 <pre>
-[ PIR Sensor ] --> [ Pico (C SDK) ]
-         |                  |
-         |        GPIO Signal (3.3V)
-         ↓                  ↓
-   [ LED + Buzzer ]     [ Raspberry Pi (Python) ]
-                             |
-                        Captures Image
-                        Uploads to Firebase
-                        Sends FCM Notification
-                             ↓
-                      [ Android App (Compose) ]
-                      - Receives push alert
-                      - Views image and timestamp
+        [ PIR Sensor ] ───▶ [ Pico W (C SDK + FreeRTOS) ]
+              |                     |
+              | GPIO (3.3V)        | MQTT (status/events)
+              ↓                     ↓
+       [ LED + Buzzer ]      [ Raspberry Pi (Python + Flask + MQTT) ]
+                                   |           |
+                         Camera Capture    MQTT Bridge
+                         + Live Stream     + Device Control
+                                   |           |
+                          Uploads to Firebase  |
+                          Sends FCM Alert      |
+                                   ↓           |
+                          [ Android App (Compose) ]
+                          - Receives push alert
+                          - Views images/events
+                          - Live video stream
+                          - Rotate camera (pan)
+                                   |
+                                   | MQTT command
+                                   ↓
+                         [ Pico W Motor Driver ]
+                                   |
+                                   ↓
+                           [ Camera Rotor ]
 </pre>
 
 <h2>🛠️ Tech Stack</h2>
@@ -61,6 +77,7 @@
   <tr><td>Cloud</td><td>Firebase Storage + Realtime DB</td></tr>
   <tr><td>Notification</td><td>Firebase Cloud Messaging (FCM)</td></tr>
   <tr><td>Mobile App</td><td>Android (Jetpack Compose, Kotlin)</td></tr>
+  <tr><td>Http live server</td><td>Python flask server</td></tr>
 </table>
 
 <h2>🔧 Hardware Requirements</h2>
@@ -72,6 +89,7 @@
   <tr><td>LED</td><td>Visual motion detection indicator.</td><td><img src="hardware/led.jpg" alt="LED" width="200"></td></tr>
   <tr><td>Buzzer</td><td>Audible alert on motion detection.</td><td><img src="hardware/buzzer.jpg" alt="Buzzer" width="200"></td></tr>
   <tr><td>Pi Camera</td><td>Captures images when motion is detected.</td><td><img src="hardware/camera.jpg" alt="Pi Camera" width="200"></td></tr>
+  <tr><td>Rotor</td><td>Rotates camera</td><td><img src="hardware/rotor.jpg" width="200" alt="Rotor"></td></tr>
 </table>
 
 <h2>📦 Installation</h2>
@@ -106,6 +124,7 @@ make
       <li>LED → GPIO13</li>
       <li>Buzzer → GPIO15</li>
       <li>Signal to Pi → GPIO1</li>
+      <li>Rotor to pico → GPIO12 </li>
     </ul>
   </li>
 </ul>
