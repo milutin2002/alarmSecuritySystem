@@ -62,16 +62,7 @@ void alarmTask(void * _){
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
-void uartSendBlocking(char *s){
-    while(*s){
-        while(!uart_is_writable(UART_ID)){
-            tight_loop_contents();
-        }
-        uart_putc_raw(UART_ID,*s);
-        s++;
-    }
-    uart_tx_wait_blocking(UART_ID);
-}
+
 
 bool direction=true;
 int currentMills1=400,currentMills2=1600;
@@ -134,22 +125,4 @@ int main()
     xTaskCreate(servoTask,"Servo task",256,NULL,tskIDLE_PRIORITY+1,NULL);
     vTaskStartScheduler();
     while(true){}
-    /*lastTriger=get_absolute_time();
-    gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
-    while(true){
-        if(motionDetecton){
-            absolute_time_t now=get_absolute_time();
-            lastTriger=now;
-            gpio_put(ALARM_PIN,1);
-            gpio_put(LED_PIN,1);
-            uart_puts(UART_ID,"Yes\n");
-            sleep_ms(2000);
-            gpio_put(ALARM_PIN,0);
-            gpio_put(LED_PIN,0);
-            motionDetecton=false;
-            
-        }
-        tight_loop_contents();
-        sleep_ms(10);
-    }*/
 }
