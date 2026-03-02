@@ -1,13 +1,16 @@
-# Requirements for Raspberry Pi (Python) part of alarmSecuritySystem
-# OpenCV is provided via apt (`sudo apt install python3-opencv`), so we do not list opencv-python here.
+# Web server
+Flask==2.3.2
+Werkzeug==2.3.7
 
-firebase-admin
-python-dotenv
-numpy
-Flask
-picamera2
-opencv-python
+# Computer Vision (stable with NumPy 1.26)
+numpy==1.26.1
+opencv-python==4.8.0.74
 
-# Optional extras (uncomment if your script uses them)
-# requests>=2.31.0
-# pillow>=10.0.0
+# Environment variables
+python-dotenv==1.0.0
+
+# Firebase (if you're using it)
+firebase-admin==6.2.0
+
+# Optional: HTTP requests (if calling APIs)
+requests==2.31.0
