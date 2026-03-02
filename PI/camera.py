@@ -1,6 +1,7 @@
 import time
 import os
 import threading
+import cv2 as cv
 from datetime import datetime
 from picamera2 import Picamera2
 from config import IMAGE_SAVE_DIR

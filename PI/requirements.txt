@@ -6,6 +6,7 @@ python-dotenv
 numpy
 Flask
 picamera2
+opencv-python
 
 # Optional extras (uncomment if your script uses them)
 # requests>=2.31.0
