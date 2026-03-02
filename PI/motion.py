@@ -1,4 +1,5 @@
 import time
+import queue
 import RPi.GPIO as GPIO
 from config import MOTION_PIN
 from camera import capture_image
@@ -6,6 +7,10 @@ from firebase_service import firebase_upload, remove_file
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(MOTION_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+motion_queue=queue.Queue()
+
+
 
 
 def motion_detected(channel):
