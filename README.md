@@ -135,6 +135,8 @@ make
     <pre><code>
 sudo apt update
 sudo apt install python3 python3-pip python3-opencv libatlas-base-dev libjasper-dev libqtgui4 libqt4-test
+sudo apt install -y libcamera-apps libcamera-dev python3-libcamera
+sudo apt install libcap-dev -y
     </code></pre>
   </li>
   <li>Clone repository:
@@ -145,6 +147,8 @@ cd alarmSecuritySystem/pi
   </li>
   <li>Install Python requirements:
     <pre><code>
+python3 -m venv --system-site-packages venv
+source venv/bin/activate
 pip3 install -r requirements.txt
     </code></pre>
   </li>
