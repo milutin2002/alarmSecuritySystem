@@ -111,7 +111,7 @@ export PICO_SDK_PATH=$PWD/pico-sdk
   <li>Clone this project and build:
     <pre><code>
 git clone https://github.com/milutin2002/alarmSecuritySystem.git
-cd alarmSecuritySystem/pico
+cd alarmSecuritySystem/AlarmSysten
 mkdir build && cd build
 cmake -DWIFI_SSID="wifi_name" -DWIFI_PASS="wifi_password" ..
 make
@@ -142,7 +142,7 @@ sudo apt install libcap-dev -y
   <li>Clone repository:
     <pre><code>
 git clone https://github.com/milutin2002/alarmSecuritySystem.git
-cd alarmSecuritySystem/pi
+cd alarmSecuritySystem/PI
     </code></pre>
   </li>
   <li>Install Python requirements:
