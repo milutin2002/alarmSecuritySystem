@@ -17,8 +17,9 @@ def motion_detected(channel):
     print("Capturing image")
 
     image_path = capture_image()
-    firebase_upload(image_path)
-    remove_file(image_path)
+    if image_path:
+        firebase_upload(image_path)
+        remove_file(image_path)
 
     time.sleep(5)
 

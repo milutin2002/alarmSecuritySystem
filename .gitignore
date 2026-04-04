@@ -10,3 +10,6 @@ PI/venv
 /build
 google-services.json
 PI/surveilence-55d76-28b6282b85cf.json
+yolov8n.onnx
+yolov5nu.pt
+yolov8n.pt

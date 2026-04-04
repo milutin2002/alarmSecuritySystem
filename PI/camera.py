@@ -5,6 +5,7 @@ import cv2 as cv
 from datetime import datetime
 from picamera2 import Picamera2
 from config import IMAGE_SAVE_DIR
+from aiDeploy import isPerson
 
 camera = Picamera2()
 camera.start()
@@ -36,4 +37,4 @@ def capture_image():
     with lock:
         camera.capture_file(filename)
 
-    return filename
+    return isPerson(filename)
