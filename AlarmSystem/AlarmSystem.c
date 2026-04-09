@@ -17,7 +17,10 @@ extern bool stream;
 absolute_time_t lastTriger;
 bool motionDetecton=false;
 EventGroupHandle_t netEvents;
+
+
 SemaphoreHandle_t mutexMotion;
+extern SemaphoreHandle_t mutexStatus;
 
 void initGpio(){
     gpio_init(PIR_PIN);
@@ -48,22 +51,30 @@ void alarmTask(void * _){
     while(true){
         printf("Trying to detect\n");
         if(xSemaphoreTake(mutexMotion,portMAX_DELAY)==pdTRUE){
-        if(motionDetecton && status){
-            absolute_time_t now=get_absolute_time();
-            lastTriger=now;
-            gpio_put(ALARM_PIN,1);
-            gpio_put(LED_PIN,1);
-            //uart_puts(UART_ID,"Yes\n");
-            gpio_put(SIGNAL_PIN,0);
-            sleep_ms(2000);
-            gpio_put(ALARM_PIN,0);
-            gpio_put(LED_PIN,0);
-            gpio_put(SIGNAL_PIN,1);
-            motionDetecton=false;
+        if(motionDetecton){
+            if(xSemaphoreTake(mutexStatus,portMAX_DELAY)==pdTRUE){
+                absolute_time_t now=get_absolute_time();
+                lastTriger=now;
+                gpio_put(ALARM_PIN,1);
+                gpio_put(LED_PIN,1);
+                //uart_puts(UART_ID,"Yes\n");
+                gpio_put(SIGNAL_PIN,0);
+                sleep_ms(2000);
+                gpio_put(ALARM_PIN,0);
+                gpio_put(LED_PIN,0);
+                gpio_put(SIGNAL_PIN,1);
+                motionDetecton=false;
+                xSemaphoreGive(mutexStatus);
+            }
         }
-        else if(!status){
-            motionDetecton=false;
+        else{   
+            if(xSemaphoreTake(mutexStatus,portMAX_DELAY)==pdTRUE){
+                if(!status){
+                    motionDetecton=false;
+                }
+                xSemaphoreGive(mutexStatus);
         }
+    }
         xSemaphoreGive(mutexMotion);
     }
         vTaskDelay(pdMS_TO_TICKS(100));
@@ -86,6 +97,7 @@ int main()
     netEvents=xEventGroupCreate();
     setServo(SERVO_PIN1,currentMills1);
     mutexMotion=xSemaphoreCreateMutex();
+    mutexStatus=xSemaphoreCreateMutex();
     queue=xQueueCreate(COUNT_QUEUE_LEN,sizeof(enum Action));
     gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
     xTaskCreate(wifiTask,"Wifi task",256,NULL,tskIDLE_PRIORITY+1,NULL);

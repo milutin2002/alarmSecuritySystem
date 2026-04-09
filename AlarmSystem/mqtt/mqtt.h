@@ -3,6 +3,7 @@
 #include "lwip/api.h"
 #include "lwip/err.h"
 #include "lwip/apps/mqtt.h"
+#include "semphr.h"
 
 
 #ifndef MQTT_H
@@ -23,6 +24,8 @@
 static mqtt_client_t *mq=NULL;
 
 extern QueueHandle_t queue;
+
+extern SemaphoreHandle_t mutexStatus;
 
 enum Action{
     LEFT,RIGHT,UP,DOWN

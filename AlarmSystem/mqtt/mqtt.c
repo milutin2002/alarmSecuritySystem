@@ -1,11 +1,13 @@
 #include "mqtt.h"
 
+
 bool status=true;
 
 bool stream=false;
 
 QueueHandle_t queue = NULL;
 
+SemaphoreHandle_t mutexStatus=NULL;
 
 static char currentTopic[64];
 
@@ -18,7 +20,10 @@ static void onData(void *arg,const u8_t *data,u16_t len,u8_t flags){
     char buf[8];
     printf("Handling topis %s\n",currentTopic);
     if(strcmp(currentTopic,TOPIC_SET)==0){
-        status=!status;
+        if(xSemaphoreTake(mutexStatus,portMAX_DELAY)==pdTRUE){
+            status=!status;
+            xSemaphoreGive(mutexStatus);
+        }
         publishData(status?"ON":"OFF");
     }
     else if(strcmp(currentTopic,TOPIC_LEFT)==0){
