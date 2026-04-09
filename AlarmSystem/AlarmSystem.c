@@ -1,5 +1,4 @@
 #include "hardware/uart.h"
-#include "mqtt/mqtt.h"
 #include "servo/servo.h"
 
 #define PIR_PIN 17
@@ -65,47 +64,8 @@ void alarmTask(void * _){
 
 
 bool direction=true;
-int currentMills1=400,currentMills2=1600;
-#define SERVO_PIN1 12
-#define SERVO_PIN2 11
 
 
-
-void servoTask(void *){
-    while(true){
-        enum Action cmd=LEFT;
-        BaseType_t res=xQueueReceive(queue,&cmd,0);
-        if(res==pdTRUE){
-            if(cmd==LEFT){
-                if(currentMills1<2400){
-                    currentMills1+=50;
-                }
-                setMills(SERVO_PIN1,currentMills1);
-            }
-            else if(cmd==RIGHT){
-                if(currentMills1>400){
-                    currentMills1-=50;
-                }
-                setMills(SERVO_PIN1,currentMills1);
-            }
-            else if(cmd==UP){
-                printf("Increasing height\n");
-                /*if(currentMills2<2400){
-                    currentMills2+=50;
-                }*/
-                //setMills(SERVO_PIN2,currentMills2);
-            }
-            else{
-                /*if(currentMills2>400){
-                    currentMills2-=50;
-                }
-                setMills(SERVO_PIN2,currentMills2);*/
-            }
-            
-        }
-        sleep_ms(100);
-    }
-}
 int main()
 {
     stdio_init_all();
