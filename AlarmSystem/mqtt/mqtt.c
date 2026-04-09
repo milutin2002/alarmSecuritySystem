@@ -6,6 +6,7 @@ bool stream=false;
 
 QueueHandle_t queue = NULL;
 
+
 static char currentTopic[64];
 
 static void onTopic(void *arg,const char *topic,u32_t len){
@@ -49,7 +50,6 @@ static void onConnect(mqtt_client_t *client,void *arg,mqtt_connection_status_t s
         printf("MQTT connected\n");
         mqtt_set_inpub_callback(mq,onTopic,onData,NULL);
         mqtt_subscribe(mq,TOPIC_SET,0,NULL,NULL);
-        mqtt_subscribe(mq,TOPIC_STREAM,0,NULL,NULL);
         mqtt_subscribe(mq,TOPIC_LEFT,0,NULL,NULL);
         mqtt_subscribe(mq,TOPIC_RIGHT,0,NULL,NULL);
         mqtt_subscribe(mq,TOPIC_DOWN,0,NULL,NULL);

@@ -1,5 +1,6 @@
 #include "hardware/uart.h"
 #include "servo/servo.h"
+#include "semphr.h"
 
 #define PIR_PIN 17
 #define LED_PIN 13
@@ -16,6 +17,7 @@ extern bool stream;
 absolute_time_t lastTriger;
 bool motionDetecton=false;
 EventGroupHandle_t netEvents;
+SemaphoreHandle_t mutexMotion;
 
 void initGpio(){
     gpio_init(PIR_PIN);
@@ -36,13 +38,17 @@ void detectMotion(uint gpio, uint32_t events){
     absolute_time_t now=get_absolute_time();
     if(absolute_time_diff_us(lastTriger,now)>2*1000*10){
         lastTriger=now;
-        motionDetecton=true;
+        if(xSemaphoreTake(mutexMotion,portMAX_DELAY)==pdTRUE){
+            motionDetecton=true;
+        }
+        xSemaphoreGive(mutexMotion);
     }
 }
 void alarmTask(void * _){
     while(true){
         printf("Trying to detect\n");
-        if(motionDetecton && status && !stream){
+        if(xSemaphoreTake(mutexMotion,portMAX_DELAY)==pdTRUE){
+        if(motionDetecton && status){
             absolute_time_t now=get_absolute_time();
             lastTriger=now;
             gpio_put(ALARM_PIN,1);
@@ -55,9 +61,11 @@ void alarmTask(void * _){
             gpio_put(SIGNAL_PIN,1);
             motionDetecton=false;
         }
-        else if(!status || stream){
+        else if(!status){
             motionDetecton=false;
         }
+        xSemaphoreGive(mutexMotion);
+    }
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
@@ -77,6 +85,7 @@ int main()
     printf("Starting app\n");
     netEvents=xEventGroupCreate();
     setServo(SERVO_PIN1,currentMills1);
+    mutexMotion=xSemaphoreCreateMutex();
     queue=xQueueCreate(COUNT_QUEUE_LEN,sizeof(enum Action));
     gpio_set_irq_enabled_with_callback(PIR_PIN,GPIO_IRQ_EDGE_RISE,true,&detectMotion);
     xTaskCreate(wifiTask,"Wifi task",256,NULL,tskIDLE_PRIORITY+1,NULL);

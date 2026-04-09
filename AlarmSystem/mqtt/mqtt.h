@@ -12,7 +12,6 @@
 #define MQTT_PORT 1883
 #define TOPIC_SET "pico/alarm/set"
 #define TOPIC_STATUS "pico/alarm/status"
-#define TOPIC_STREAM "pico/stream/set"
 
 #define TOPIC_LEFT "pico/servo/left"
 #define TOPIC_RIGHT "pico/servo/right"
@@ -28,6 +27,8 @@ extern QueueHandle_t queue;
 enum Action{
     LEFT,RIGHT,UP,DOWN
 };
+
+
 
 extern EventGroupHandle_t netEvents;
 
