@@ -8,10 +8,10 @@
 #include  "task.h"
 #include "queue.h"
 #include "event_groups.h"
+#include "semphr.h"
 
-#define NET_READY_BIT (1U << 0)
 
-extern EventGroupHandle_t netEvents;
+
 
 #ifndef WIFI_SSID
 #define WIFI_SSID "Change me"
