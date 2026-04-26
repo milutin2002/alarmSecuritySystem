@@ -18,9 +18,9 @@ void ServoAgent::setMills(int pin, float mills) {
 }
 
 void ServoAgent::run() {
+    Action cmd;
     while (true) {
-        Action cmd = LEFT;
-        if (xQueueReceive(queue, &cmd, 0) == pdTRUE) {
+        if (xQueueReceive(queue, &cmd, portMAX_DELAY) == pdTRUE) {
             if (cmd == LEFT) {
                 if (mills1 < 2400) mills1 += 50;
                 setMills(SERVO_PIN1, mills1);
@@ -31,6 +31,5 @@ void ServoAgent::run() {
                 printf("Increasing height\n");
             }
         }
-        sleep_ms(100);
     }
 }

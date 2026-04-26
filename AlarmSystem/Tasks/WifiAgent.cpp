@@ -1,6 +1,6 @@
 #include "WifiAgent.h"
 
-WifiAgent::WifiAgent(MqttAgent &mqttAgent)
+WifiAgent::WifiAgent(Agent &mqttAgent)
     : Agent("Wifi Task", tskIDLE_PRIORITY + 1, 256), mqttAgent(mqttAgent) {}
 
 void WifiAgent::run() {

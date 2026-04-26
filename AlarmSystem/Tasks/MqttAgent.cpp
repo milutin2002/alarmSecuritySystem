@@ -12,9 +12,25 @@ MqttAgent::MqttAgent(bool &status, SemaphoreHandle_t &mutexStatus, QueueHandle_t
 
 void MqttAgent::onTopic(void *arg, const char *topic, u32_t len) {
     MqttAgent *self = static_cast<MqttAgent*>(arg);
-    strncpy(self->currentTopic, topic, sizeof(self->currentTopic) - 1);
-    self->currentTopic[len] = '\0';
-    printf("MQTT incoming topic %s len %lu\n", topic, (unsigned long)len);
+
+    Action cmd;
+    bool isServoCmd = true;
+    if (strcmp(topic, TOPIC_SET) == 0) {
+        if (xSemaphoreTake(self->mutexStatus, portMAX_DELAY) == pdTRUE) {
+            self->status = !self->status;
+            xSemaphoreGive(self->mutexStatus);
+        }
+        self->publishData(self->status ? "ON" : "OFF");
+    }
+    else if      (strcmp(topic, TOPIC_LEFT)  == 0) cmd = LEFT;
+    else if (strcmp(topic, TOPIC_RIGHT) == 0) cmd = RIGHT;
+    else if (strcmp(topic, TOPIC_UP)    == 0) cmd = UP;
+    else if (strcmp(topic, TOPIC_DOWN)  == 0) cmd = DOWN;
+    else isServoCmd = false;
+
+    if (isServoCmd) {
+        xQueueSendToBack(self->queue, &cmd, 0);
+    }
 }
 
 void MqttAgent::onData(void *arg, const u8_t *data, u16_t len, u8_t flags) {

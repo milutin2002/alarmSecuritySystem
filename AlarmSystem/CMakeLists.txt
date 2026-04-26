@@ -41,12 +41,16 @@ pico_sdk_init()
 # Add executable. Default name is the project name, version 0.1
 
 add_executable(AlarmSystem
-    AlarmSystem.c
-    servo/servo.c
-    mqtt/mqtt.c
-    alarm/alarm.c
-    wifi/wifi.c
+    AlarmSystem.cpp
+    Tasks/Agent.cpp
+    Tasks/AlarmAgent.cpp
+    Tasks/MqttAgent.cpp
+    Tasks/ServoAgent.cpp
+    Tasks/WifiAgent.cpp
+    Tasks/AgentFactory.cpp
 )
+
+
 
 pico_set_program_name(AlarmSystem "AlarmSystem")
 pico_set_program_version(AlarmSystem "0.1")

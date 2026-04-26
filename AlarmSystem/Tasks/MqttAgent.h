@@ -22,3 +22,5 @@ private:
     static void onData(void *arg, const u8_t *data, u16_t len, u8_t flags);
     static void onConnect(mqtt_client_t *client, void *arg, mqtt_connection_status_t st);
 };
+
+
