@@ -53,17 +53,19 @@ void alarmTask(void * _){
         if(xSemaphoreTake(mutexMotion,portMAX_DELAY)==pdTRUE){
         if(motionDetecton){
             if(xSemaphoreTake(mutexStatus,portMAX_DELAY)==pdTRUE){
-                absolute_time_t now=get_absolute_time();
-                lastTriger=now;
-                gpio_put(ALARM_PIN,1);
-                gpio_put(LED_PIN,1);
-                //uart_puts(UART_ID,"Yes\n");
-                gpio_put(SIGNAL_PIN,0);
-                sleep_ms(2000);
-                gpio_put(ALARM_PIN,0);
-                gpio_put(LED_PIN,0);
-                gpio_put(SIGNAL_PIN,1);
-                motionDetecton=false;
+                    if(status){
+                    absolute_time_t now=get_absolute_time();
+                    lastTriger=now;
+                    gpio_put(ALARM_PIN,1);
+                    gpio_put(LED_PIN,1);
+                    //uart_puts(UART_ID,"Yes\n");
+                    gpio_put(SIGNAL_PIN,0);
+                    sleep_ms(2000);
+                    gpio_put(ALARM_PIN,0);
+                    gpio_put(LED_PIN,0);
+                    gpio_put(SIGNAL_PIN,1);
+                    motionDetecton=false;
+                }
                 xSemaphoreGive(mutexStatus);
             }
         }
