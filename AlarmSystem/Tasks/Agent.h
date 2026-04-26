@@ -2,9 +2,12 @@
 
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "pico/cyw43_arch.h"
 #include "FreeRTOS.h"
-#include "task.h"
-#include <queue.h>
+#include  "task.h"
+#include "queue.h"
+#include "event_groups.h"
+#include "semphr.h"
 
 class Agent {
 public:

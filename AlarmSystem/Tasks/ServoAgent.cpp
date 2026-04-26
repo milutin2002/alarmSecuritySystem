@@ -27,9 +27,7 @@ void ServoAgent::run() {
             } else if (cmd == RIGHT) {
                 if (mills1 > 400) mills1 -= 50;
                 setMills(SERVO_PIN1, mills1);
-            } else if (cmd == UP) {
-                printf("Increasing height\n");
-            }
+            } 
         }
     }
 }

@@ -14,7 +14,7 @@ void MqttAgent::onTopic(void *arg, const char *topic, u32_t len) {
     MqttAgent *self = static_cast<MqttAgent*>(arg);
 
     Action cmd;
-    bool isServoCmd = true;
+    bool isServoCmd = false;
     if (strcmp(topic, TOPIC_SET) == 0) {
         if (xSemaphoreTake(self->mutexStatus, portMAX_DELAY) == pdTRUE) {
             self->status = !self->status;
@@ -22,42 +22,21 @@ void MqttAgent::onTopic(void *arg, const char *topic, u32_t len) {
         }
         self->publishData(self->status ? "ON" : "OFF");
     }
-    else if      (strcmp(topic, TOPIC_LEFT)  == 0) cmd = LEFT;
-    else if (strcmp(topic, TOPIC_RIGHT) == 0) cmd = RIGHT;
-    else if (strcmp(topic, TOPIC_UP)    == 0) cmd = UP;
-    else if (strcmp(topic, TOPIC_DOWN)  == 0) cmd = DOWN;
-    else isServoCmd = false;
-
+    else if      (strcmp(topic, TOPIC_LEFT)  == 0) {
+        cmd = LEFT;
+        isServoCmd=true;
+    }
+    else if (strcmp(topic, TOPIC_RIGHT) == 0){ 
+        cmd = RIGHT;
+        isServoCmd=true;
+    }
     if (isServoCmd) {
         xQueueSendToBack(self->queue, &cmd, 0);
     }
 }
 
 void MqttAgent::onData(void *arg, const u8_t *data, u16_t len, u8_t flags) {
-    MqttAgent *self = static_cast<MqttAgent*>(arg);
-    printf("Handling topic %s\n", self->currentTopic);
-
-    if (strcmp(self->currentTopic, TOPIC_SET) == 0) {
-        if (xSemaphoreTake(self->mutexStatus, portMAX_DELAY) == pdTRUE) {
-            self->status = !self->status;
-            xSemaphoreGive(self->mutexStatus);
-        }
-        self->publishData(self->status ? "ON" : "OFF");
-    } else if (strcmp(self->currentTopic, TOPIC_LEFT) == 0) {
-        Action cmd = LEFT;
-        xQueueSendToBack(self->queue, &cmd, 0);
-    } else if (strcmp(self->currentTopic, TOPIC_RIGHT) == 0) {
-        Action cmd = RIGHT;
-        xQueueSendToBack(self->queue, &cmd, 0);
-    } else if (strcmp(self->currentTopic, TOPIC_UP) == 0) {
-        Action cmd = UP;
-        printf("Going up\n");
-        xQueueSendToBack(self->queue, &cmd, 0);
-    } else if (strcmp(self->currentTopic, TOPIC_DOWN) == 0) {
-        Action cmd = DOWN;
-        printf("Going down\n");
-        xQueueSendToBack(self->queue, &cmd, 0);
-    }
+    
 }
 
 void MqttAgent::publishData(const char *data) {

@@ -1,8 +1,16 @@
 #pragma once
 
+#ifndef WIFI_SSID
+#define WIFI_SSID "Change me"
+#endif
+
+#ifndef WIFI_PASS
+#define WIFI_PASS "Change me"
+#endif
+
 #include "Agent.h"
 #include "AlarmShared.h"
-#include "wifi/wifi.h"
+
 #include "lwip/apps/mqtt.h"
 
 class MqttAgent : public Agent {
