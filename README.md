@@ -92,6 +92,9 @@
   <tr><td>Rotor</td><td>Rotates camera</td><td><img src="hardware/rotor.jpg" width="200" alt="Rotor"></td></tr>
 </table>
 
+<h2>🔌 Breadboard Layout</h2>
+<img src="Pictures/Breadboard Layout.png" alt="Breadboard Layout" width="800">
+
 <h2>📦 Installation</h2>
 
 <h3>1️⃣ Raspberry Pi Pico (C SDK)</h3>
